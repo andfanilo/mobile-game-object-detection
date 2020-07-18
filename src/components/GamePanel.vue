@@ -3,40 +3,13 @@
     <game-info class="header" header="Find objects" :score="score" :timer="timer" />
     <div ref="videoWrapper" class="webcam-wrapper">
       <video ref="video" class="webcam-wrapper__video" id="video" autoplay muted playsinline />
-      <svg
+      <zones-frame
         class="webcam-wrapper__canvas"
         :height="videoHeight"
         :width="videoWidth"
         :viewBox="svgViewbox"
-        preserveAspectRatio="none"
-      >
-        <rect
-          v-for="zone in zones"
-          :key="`${zone.label}-frame-${zone.bbox.x1}-${zone.bbox.y1}`"
-          :x="zone.bbox.x1"
-          :y="zone.bbox.y1"
-          :width="zone.bbox.x2 - zone.bbox.x1"
-          :height="zone.bbox.y2 - zone.bbox.y1"
-          :stroke="`rgb(${zone.bbox.color})`"
-          stroke-width="3"
-          fill-opacity="0"
-        />
-        <rect
-          v-for="zone in zones"
-          :key="`${zone.label}-textBox-${zone.bbox.x1}-${zone.bbox.y1}`"
-          :x="zone.bbox.x1"
-          :y="zone.bbox.y1"
-          :width="zone.bbox.x2 - zone.bbox.x1"
-          :height="textBoxHeight"
-          :fill="`rgb(${zone.bbox.color})`"
-        />
-        <text
-          v-for="zone in zones"
-          v-bind:key="`${zone.label}-label-${zone.bbox.x1}-${zone.bbox.y1}`"
-          v-bind:x="zone.bbox.x1"
-          v-bind:y="zone.bbox.y1 + textBoxHeight"
-        >{{`${zone.label}:${zone.confidence.toFixed(2)}`}}</text>
-      </svg>
+        :zones="zones"
+      />
     </div>
     <animated-word-list class="footer" :words="Array.from(foundWords).reverse()" />
     <canvas ref="canvas" class="canvas" :width="frameWidth" :height="frameHeight"></canvas>
@@ -46,6 +19,7 @@
 <script>
 import AnimatedWordList from "./AnimatedWordList.vue";
 import GameInfo from "./GameInfo.vue";
+import ZonesFrame from "./ZonesFrame.vue";
 
 const constraints = {
   video: { facingMode: "environment" },
@@ -54,7 +28,7 @@ const constraints = {
 
 export default {
   name: "GamePanel",
-  components: { AnimatedWordList, GameInfo },
+  components: { AnimatedWordList, GameInfo, ZonesFrame },
   data() {
     return {
       video: null, // reference to video element
@@ -70,7 +44,6 @@ export default {
       score: 0,
       timer: 90,
       foundWords: new Set(), // all unique labels found by the user
-      textBoxHeight: 14, // height of text displayed in svg
       isComputing: 0 // Is a request waiting ?
     };
   },
@@ -85,7 +58,8 @@ export default {
   },
   methods: {
     /**
-     * Start game by initializing the timer and zone refresh clocks
+     * Start game by initializing a timer
+     * And a periodic prediction of zones for detected objects
      */
     handleStartGame() {
       if (this.startGame) {
@@ -181,7 +155,9 @@ export default {
       }
     },
     /**
-     * Decrement timer to 0, and emit an end-game event back to parent App when timer is at 0
+     * Decrement timer to 0
+     * Clean component
+     * Emit an end-game event back to parent App when timer is at 0
      */
     manageTimer() {
       if (this.timer > 0) {
@@ -225,18 +201,11 @@ export default {
       navigator.mediaDevices
         .getUserMedia(constraints)
         .then(stream => {
-          /*
-          var videoTracks = stream.getVideoTracks();
-
-          this.cameraSettings = videoTracks[0].getSettings();
-          /*this.svgViewbox = `0 0 ${this.cameraSettings.width} ${
-            this.cameraSettings.height
-          }`;*/
-
           this.video.srcObject = stream;
           this.video.play();
 
-          //Listen for the loadedmetadata event which is dispatched when the user agent has just determined the duration and dimensions of the media resource
+          // Listen for the loadedmetadata event which is dispatched
+          // when the user agent has just determined the duration and dimensions of the media resource
           this.video.addEventListener(
             "loadedmetadata",
             this.handleWindowResize
