@@ -42,20 +42,14 @@
         >{{`${zone.label}:${zone.confidence.toFixed(2)}`}}</text>
       </svg>
     </div>
-    <div class="footer">
-      <transition-group name="word-list" class="word-list" tag="ul">
-        <li
-          class="word-list__item"
-          v-for="word in Array.from(foundWords).reverse()"
-          v-bind:key="word"
-        >{{ word }}</li>
-      </transition-group>
-    </div>
+    <animated-word-list class="footer" :words="Array.from(foundWords).reverse()" />
     <canvas ref="canvas" class="canvas" :width="frameWidth" :height="frameHeight"></canvas>
   </div>
 </template>
 
 <script>
+import AnimatedWordList from "./AnimatedWordList.vue";
+
 const constraints = {
   video: { facingMode: "environment" },
   audio: false
@@ -63,6 +57,7 @@ const constraints = {
 
 export default {
   name: "GamePanel",
+  components: { AnimatedWordList },
   data() {
     return {
       video: null, // reference to video element
@@ -129,6 +124,17 @@ export default {
                   color: "255,0,0"
                 },
                 label: "cat",
+                confidence: 0.8380282521247864
+              },
+              {
+                bbox: {
+                  x1: 10,
+                  y1: 30,
+                  x2: 50,
+                  y2: 50,
+                  color: "0,255,0"
+                },
+                label: "dog",
                 confidence: 0.8380282521247864
               }
             ];
@@ -322,28 +328,5 @@ export default {
   color: #fcfcfc;
   z-index: 1;
   overflow: hidden;
-}
-
-.word-list {
-  white-space: nowrap;
-}
-
-.word-list__item {
-  display: inline-block;
-  margin-right: 2em;
-}
-
-.word-list-enter-active,
-.word-list-leave-active {
-  transition: all 1s;
-}
-
-.word-list-enter,
-.word-list-leave-to {
-  opacity: 0;
-}
-
-.word-list-move {
-  transition: transform 1s;
 }
 </style>
