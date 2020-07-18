@@ -4,16 +4,9 @@
       <h1>Welcome to the mobile game object detector !</h1>
       <p>Our model can recognize up to 110 different objects. How many can you detect in 90 seconds ?</p>
       <p>
-        <input v-model="name" placeholder="Enter your name" />
+        <input v-model="inputName" placeholder="Enter your name" />
       </p>
-      <transition name="error">
-        <p class="error" v-show="errorMessage != ''">{{errorMessage}}</p>
-      </transition>
-      <button
-        class="panel__content__play"
-        :disabled="name === ''"
-        v-on:click="handleClick(name)"
-      >Play</button>
+      <button class="panel__content__play" :disabled="inputName === ''" @click="handleClick()">Play</button>
     </div>
   </div>
 </template> 
@@ -23,13 +16,12 @@ export default {
   name: "NamePanel",
   data() {
     return {
-      name: "",
-      errorMessage: ""
+      inputName: ""
     };
   },
   methods: {
-    handleClick(name) {
-      this.$emit("start-game", name);
+    handleClick() {
+      this.$emit("start-game", this.inputName);
     }
   }
 };
@@ -55,19 +47,5 @@ export default {
   padding: 1em;
   font-size: 1.5rem;
   text-decoration: none;
-}
-
-.error {
-  padding: 3px;
-  color: #fcfcfc;
-  background-color: red;
-}
-
-.error-enter-active,
-.error-leave-active {
-  transition: opacity 0.5s;
-}
-.error-enter, .error-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
 }
 </style>

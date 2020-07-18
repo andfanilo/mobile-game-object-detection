@@ -5,10 +5,10 @@
       @start-game="handleStartGame"
       :class="{ 'name-panel--collapsed': gameStarted }"
     />
-    <game-panel :startGame="gameStarted" :name="name" @end-game="handleEndGame" />
+    <game-panel :startGame="gameStarted" :inputName="inputName" @end-game="handleEndGame" />
     <score-panel
       class="score-panel"
-      :name="name"
+      :inputName="inputName"
       :score="score"
       :leaderboard="leaderboard"
       :position="position"
@@ -31,7 +31,7 @@ export default {
   },
   data() {
     return {
-      name: "",
+      inputName: "",
       score: 0,
       position: -1,
       leaderboard: [],
@@ -40,14 +40,14 @@ export default {
     };
   },
   methods: {
-    handleStartGame: function(value) {
-      this.name = value;
+    handleStartGame: function(event) {
+      this.inputName = event;
       this.gameStarted = true;
     },
-    handleEndGame: function(value) {
-      this.score = value.score;
-      this.leaderboard = value.leaderboard;
-      this.position = value.position;
+    handleEndGame: function(event) {
+      this.score = event.score;
+      this.leaderboard = event.leaderboard;
+      this.position = event.position;
       this.gameEnded = false;
     }
   }

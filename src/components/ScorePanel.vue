@@ -1,7 +1,7 @@
 <template>
   <div class="panel">
     <div class="panel__content">
-      <h2>Thanks for playing {{name}}</h2>
+      <h2>Thanks for playing {{inputName}}</h2>
       <h2>You are in position {{position}} with a score of {{score}}</h2>
       <table class="leaderboard">
         <thead>
@@ -10,9 +10,9 @@
         </thead>
         <tbody>
           <template v-for="row in leaderboard.slice(0, 4)">
-            <tr v-bind:key="`${row.pseudo}-row`">
-              <td v-bind:key="`${row.pseudo}-pseudo`">{{row.pseudo}}</td>
-              <td v-bind:key="`${row.pseudo}-score`">{{row.score}}</td>
+            <tr :key="`${row.pseudo}-row`">
+              <td :key="`${row.pseudo}-pseudo`">{{row.pseudo}}</td>
+              <td :key="`${row.pseudo}-score`">{{row.score}}</td>
             </tr>
           </template>
         </tbody>
@@ -24,7 +24,7 @@
 <script>
 export default {
   name: "ScorePanel",
-  props: ["name", "score", "position", "leaderboard"]
+  props: ["inputName", "score", "position", "leaderboard"]
 };
 </script>
 

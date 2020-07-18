@@ -5,30 +5,30 @@
       <video ref="video" class="webcam-wrapper__video" id="video" autoplay muted playsinline />
       <svg
         class="webcam-wrapper__canvas"
-        v-bind:height="videoHeight"
-        v-bind:width="videoWidth"
-        v-bind:viewBox="svgViewbox"
+        :height="videoHeight"
+        :width="videoWidth"
+        :viewBox="svgViewbox"
         preserveAspectRatio="none"
       >
         <rect
           v-for="zone in zones"
-          v-bind:key="`${zone.label}-frame-${zone.bbox.x1}-${zone.bbox.y1}`"
-          v-bind:x="zone.bbox.x1"
-          v-bind:y="zone.bbox.y1"
-          v-bind:width="zone.bbox.x2 - zone.bbox.x1"
-          v-bind:height="zone.bbox.y2 - zone.bbox.y1"
-          v-bind:stroke="`rgb(${zone.bbox.color})`"
+          :key="`${zone.label}-frame-${zone.bbox.x1}-${zone.bbox.y1}`"
+          :x="zone.bbox.x1"
+          :y="zone.bbox.y1"
+          :width="zone.bbox.x2 - zone.bbox.x1"
+          :height="zone.bbox.y2 - zone.bbox.y1"
+          :stroke="`rgb(${zone.bbox.color})`"
           stroke-width="3"
           fill-opacity="0"
         />
         <rect
           v-for="zone in zones"
-          v-bind:key="`${zone.label}-textBox-${zone.bbox.x1}-${zone.bbox.y1}`"
-          v-bind:x="zone.bbox.x1"
-          v-bind:y="zone.bbox.y1"
-          v-bind:width="zone.bbox.x2 - zone.bbox.x1"
-          v-bind:height="textBoxHeight"
-          v-bind:fill="`rgb(${zone.bbox.color})`"
+          :key="`${zone.label}-textBox-${zone.bbox.x1}-${zone.bbox.y1}`"
+          :x="zone.bbox.x1"
+          :y="zone.bbox.y1"
+          :width="zone.bbox.x2 - zone.bbox.x1"
+          :height="textBoxHeight"
+          :fill="`rgb(${zone.bbox.color})`"
         />
         <text
           v-for="zone in zones"
