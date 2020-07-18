@@ -5,7 +5,7 @@
       @start-game="handleStartGame"
       :class="{ 'name-panel--collapsed': gameStarted }"
     />
-    <game-panel :startGame="gameStarted" :inputName="inputName" @end-game="handleEndGame" />
+    <game-panel :startGame="gameStarted" @end-game="handleEndGame" />
     <score-panel
       class="score-panel"
       :inputName="inputName"
