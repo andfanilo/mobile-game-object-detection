@@ -1,27 +1,115 @@
 <template>
   <div id="app">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <NamePanel class="name-panel" v-on:close-panel="onCloseNamePanel" v-bind:class="{ 'name-panel--collapsed': namePanelCollapsed }"/>
+    <GamePanel :startVideo="namePanelCollapsed" v-bind:name="name" v-on:end-game="onOpenScorePanel"/>
+    <ScorePanel class="score-panel" v-bind:name="name" v-bind:score="score" v-bind:leaderboard="leaderboard" v-bind:position="position" v-bind:class="{ 'score-panel--collapsed': scorePanelCollapsed }"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import NamePanel from "./components/NamePanel.vue";
+import GamePanel from "./components/GamePanel.vue";
+import ScorePanel from "./components/ScorePanel.vue";
 
 export default {
-  name: 'App',
+  name: "app",
   components: {
-    HelloWorld
+    NamePanel,
+    GamePanel,
+    ScorePanel
+  },
+  data() {
+    return {
+      name: "",
+      score: 0,
+      position: -1,
+      leaderboard: [],
+      namePanelCollapsed: false,
+      scorePanelCollapsed: true
+    };
+  },
+  methods: {
+    onCloseNamePanel: function(value) {
+      this.name = value;
+      this.namePanelCollapsed = true;
+    },
+    onOpenScorePanel: function(value) {
+      this.score = value.score;
+      this.leaderboard = value.leaderboard;
+      this.position = value.position;
+      this.scorePanelCollapsed = false;
+    }
   }
-}
+};
 </script>
 
 <style>
+:root {
+  box-sizing: border-box;
+}
+
+*,
+::before,
+::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+}
+
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+}
+
+/* LAYOUT */
+
+.name-panel {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.5s;
+  z-index: 2;
+}
+
+.name-panel--collapsed {
+  width: 0%;
+}
+
+.score-panel {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transition: 0.5s;
+  z-index: 2;
+}
+
+.score-panel--collapsed {
+  width: 0%;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+  margin-bottom: 1.5em;
+}
+
+td,
+th {
+  border: 1px solid #fcfcfc;
+  padding: 0.5em 2em;
+  text-align: center;
 }
 </style>
