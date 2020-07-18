@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     handleClick(name) {
-      this.$emit("close-panel", name);
+      this.$emit("start-game", name);
     }
   }
 };

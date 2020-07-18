@@ -1,8 +1,19 @@
 <template>
   <div id="app">
-    <NamePanel class="name-panel" v-on:close-panel="onCloseNamePanel" v-bind:class="{ 'name-panel--collapsed': namePanelCollapsed }"/>
-    <GamePanel :startVideo="namePanelCollapsed" v-bind:name="name" v-on:end-game="onOpenScorePanel"/>
-    <ScorePanel class="score-panel" v-bind:name="name" v-bind:score="score" v-bind:leaderboard="leaderboard" v-bind:position="position" v-bind:class="{ 'score-panel--collapsed': scorePanelCollapsed }"/>
+    <name-panel
+      class="name-panel"
+      @start-game="handleStartGame"
+      :class="{ 'name-panel--collapsed': gameStarted }"
+    />
+    <game-panel :startGame="gameStarted" :name="name" @end-game="handleEndGame" />
+    <score-panel
+      class="score-panel"
+      :name="name"
+      :score="score"
+      :leaderboard="leaderboard"
+      :position="position"
+      :class="{ 'score-panel--collapsed': gameEnded }"
+    />
   </div>
 </template>
 
@@ -24,20 +35,20 @@ export default {
       score: 0,
       position: -1,
       leaderboard: [],
-      namePanelCollapsed: false,
-      scorePanelCollapsed: true
+      gameStarted: false,
+      gameEnded: true
     };
   },
   methods: {
-    onCloseNamePanel: function(value) {
+    handleStartGame: function(value) {
       this.name = value;
-      this.namePanelCollapsed = true;
+      this.gameStarted = true;
     },
-    onOpenScorePanel: function(value) {
+    handleEndGame: function(value) {
       this.score = value.score;
       this.leaderboard = value.leaderboard;
       this.position = value.position;
-      this.scorePanelCollapsed = false;
+      this.gameEnded = false;
     }
   }
 };

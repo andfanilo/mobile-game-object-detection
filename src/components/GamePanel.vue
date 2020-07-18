@@ -74,9 +74,9 @@ export default {
       isComputing: 0 // Is a request waiting ?
     };
   },
-  props: ["startVideo", "name"], // watch the startVideo property which will be changed by parent App
+  props: ["startGame", "name"], // watch the startGame property which will be changed by parent App
   watch: {
-    startVideo: "startGame" // when parent App changes the startVideo property, run the startGame method
+    startGame: "handleStartGame" // when parent App changes the startGame property, run the startGame method
   },
   computed: {
     svgViewbox: function() {
@@ -87,8 +87,8 @@ export default {
     /**
      * Start game by initializing the timer and zone refresh clocks
      */
-    startGame(startVideo) {
-      if (startVideo) {
+    handleStartGame() {
+      if (this.startGame) {
         this.zoneRefreshClock = setInterval(
           this.updateZones.bind(this),
           process.env.VUE_APP_REFRESH_RATE
