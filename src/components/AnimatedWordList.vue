@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <transition-group name="word-list" class="word-list" tag="ul">
       <li class="word-list__item" v-for="word in words" v-bind:key="word">{{ word }}</li>
     </transition-group>
@@ -9,11 +9,16 @@
 <script>
 export default {
   name: "AnimatedWordList",
-  props: { words: Array },
+  props: { words: Array }
 };
 </script>
 
 <style scoped>
+.container {
+  background-color: #0066a1;
+  color: #fcfcfc;
+}
+
 .word-list {
   white-space: nowrap;
 }

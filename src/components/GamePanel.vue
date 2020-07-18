@@ -1,10 +1,6 @@
 <template>
   <div class="container">
-    <div class="header">
-      <h4 class="lead">Find objects</h4>
-      <div class="score">Score: {{score}}</div>
-      <div class="timer">Time : {{timer}}</div>
-    </div>
+    <game-info class="header" header="Find objects" :score="score" :timer="timer" />
     <div ref="videoWrapper" class="webcam-wrapper">
       <video ref="video" class="webcam-wrapper__video" id="video" autoplay muted playsinline />
       <svg
@@ -49,6 +45,7 @@
 
 <script>
 import AnimatedWordList from "./AnimatedWordList.vue";
+import GameInfo from "./GameInfo.vue";
 
 const constraints = {
   video: { facingMode: "environment" },
@@ -57,7 +54,7 @@ const constraints = {
 
 export default {
   name: "GamePanel",
-  components: { AnimatedWordList },
+  components: { AnimatedWordList, GameInfo },
   data() {
     return {
       video: null, // reference to video element
@@ -268,27 +265,8 @@ export default {
   position: absolute;
   top: 0;
   width: 100%;
-  padding: 0.7em;
-  background-color: #0066a1;
-  color: #fcfcfc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 1;
   overflow: hidden;
-}
-
-.lead {
-  flex: 1;
-  margin: 0;
-}
-
-.score {
-  flex: 1;
-}
-
-.timer {
-  flex: 1;
 }
 
 .webcam-wrapper {
@@ -324,8 +302,6 @@ export default {
   bottom: 0;
   width: 100%;
   height: 3em;
-  background-color: #0066a1;
-  color: #fcfcfc;
   z-index: 1;
   overflow: hidden;
 }
