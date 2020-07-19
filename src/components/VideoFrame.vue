@@ -1,6 +1,13 @@
 <template>
   <div>
-    <video ref="video" class="video-wrapper__video" id="video" autoplay muted playsinline />
+    <video
+      ref="video"
+      class="video-wrapper__video"
+      id="video"
+      autoplay
+      muted
+      playsinline
+    />
     <zones-frame
       class="video-wrapper__zones"
       :height="videoHeight"
@@ -10,13 +17,13 @@
     />
   </div>
 </template>
-    
+
 <script>
 import ZonesFrame from "./ZonesFrame.vue";
 
 const constraints = {
   video: { facingMode: "environment" },
-  audio: false
+  audio: false,
 };
 
 export default {
@@ -30,17 +37,17 @@ export default {
       frameWidth: 640,
       frameHeight: 480,
       videoWidth: 0, // refresh width of video that is passed to svg width
-      videoHeight: 0 // refresh height of video that is passed to svg height
+      videoHeight: 0, // refresh height of video that is passed to svg height
     };
   },
   props: ["playVideo"],
   watch: {
-    playVideo: "handleVideoPropChange" // when parent App changes the startGame property, run the startGame method
+    playVideo: "handleVideoPropChange", // when parent App changes the startGame property, run the startGame method
   },
   computed: {
     zonesViewbox: function() {
       return `0 0 ${this.frameWidth} ${this.frameHeight}`;
-    }
+    },
   },
   methods: {
     /**
@@ -85,7 +92,7 @@ export default {
       window.removeEventListener("resize", this.handleWindowResize);
       window.removeEventListener("orientationchange", this.handleWindowResize);
       this.video.removeEventListener("loadedmetadata", this.handleWindowResize);
-    }
+    },
   },
   mounted() {
     this.video = this.$refs.video;
@@ -97,10 +104,10 @@ export default {
           y1: 60,
           x2: 400,
           y2: 300,
-          color: "255,0,0"
+          color: "255,0,0",
         },
         label: "cat",
-        confidence: 0.8380282521247864
+        confidence: 0.8380282521247864,
       },
       {
         bbox: {
@@ -108,17 +115,17 @@ export default {
           y1: 30,
           x2: 50,
           y2: 50,
-          color: "0,255,0"
+          color: "0,255,0",
         },
         label: "dog",
-        confidence: 0.8380282521247864
-      }
+        confidence: 0.8380282521247864,
+      },
     ];
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia(constraints)
-        .then(stream => {
+        .then((stream) => {
           this.video.srcObject = stream;
           this.video.play();
 
@@ -131,12 +138,12 @@ export default {
           window.addEventListener("resize", this.handleWindowResize);
           window.addEventListener("orientationchange", this.handleWindowResize);
         })
-        .catch(err => console.log("navigator.getUserMedia error: ", err));
+        .catch((err) => console.log("navigator.getUserMedia error: ", err));
     }
   },
   beforeDestroy() {
     this.cleanVideo();
-  }
+  },
 };
 </script>
 

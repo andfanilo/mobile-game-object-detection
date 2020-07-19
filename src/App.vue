@@ -1,11 +1,22 @@
 <template>
   <div id="app">
+    <loading
+      :active="!modelLoaded"
+      :can-cancel="false"
+      :is-full-page="true"
+      :z-index="9"
+      color="#428bca"
+    ></loading>
     <name-panel
       class="name-panel"
       @start-game="handleStartGame"
       :class="{ 'name-panel--collapsed': gameStarted }"
     />
-    <game-panel :startGame="gameStarted" @end-game="handleEndGame" />
+    <game-panel
+      @model-loaded="handleModelLoaded"
+      :startGame="gameStarted"
+      @end-game="handleEndGame"
+    />
     <score-panel
       class="score-panel"
       :inputName="inputName"
@@ -21,13 +32,16 @@
 import NamePanel from "./components/NamePanel.vue";
 import GamePanel from "./components/GamePanel.vue";
 import ScorePanel from "./components/ScorePanel.vue";
+import Loading from "vue-loading-overlay";
+import "vue-loading-overlay/dist/vue-loading.css";
 
 export default {
   name: "app",
   components: {
     NamePanel,
     GamePanel,
-    ScorePanel
+    ScorePanel,
+    Loading,
   },
   data() {
     return {
@@ -35,22 +49,28 @@ export default {
       score: 0,
       position: -1,
       leaderboard: [],
+      modelLoaded: false,
       gameStarted: false,
-      gameEnded: true
+      gameEnded: true,
     };
   },
   methods: {
+    handleModelLoaded: function() {
+      this.modelLoaded = true;
+    },
     handleStartGame: function(event) {
-      this.inputName = event;
-      this.gameStarted = true;
+      if (this.modelLoaded) {
+        this.inputName = event;
+        this.gameStarted = true;
+      }
     },
     handleEndGame: function(event) {
       this.score = event.score;
       this.leaderboard = event.leaderboard;
       this.position = event.position;
       this.gameEnded = false;
-    }
-  }
+    },
+  },
 };
 </script>
 
