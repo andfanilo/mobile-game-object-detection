@@ -10,6 +10,7 @@
       class="video-wrapper"
       :playVideo="playVideo"
       @model-loaded="$emit('model-loaded')"
+      @webcam-ready="$emit('webcam-ready')"
       @zone-prediction="receiveZoneLabels"
     />
     <animated-word-list

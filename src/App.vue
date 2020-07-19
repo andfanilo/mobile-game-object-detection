@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <loading
-      :active="!modelLoaded"
+      :active="!(modelLoaded & webcamReady)"
       :can-cancel="false"
       :is-full-page="true"
       :z-index="9"
@@ -13,7 +13,8 @@
       :class="{ 'name-panel--collapsed': gameStarted }"
     />
     <game-panel
-      @model-loaded="handleModelLoaded"
+      @model-loaded="modelLoaded = true"
+      @webcam-ready="webcamReady = true"
       :startGame="gameStarted"
       @end-game="handleEndGame"
     />
@@ -41,7 +42,7 @@ export default {
     NamePanel,
     GamePanel,
     ScorePanel,
-    Loading,
+    Loading
   },
   data() {
     return {
@@ -50,8 +51,9 @@ export default {
       position: -1,
       leaderboard: [],
       modelLoaded: false,
+      webcamReady: false,
       gameStarted: false,
-      gameEnded: true,
+      gameEnded: true
     };
   },
   methods: {
@@ -69,8 +71,8 @@ export default {
       this.leaderboard = event.leaderboard;
       this.position = event.position;
       this.gameEnded = false;
-    },
-  },
+    }
+  }
 };
 </script>
 

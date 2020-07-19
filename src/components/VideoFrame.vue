@@ -142,6 +142,8 @@ export default {
           );
           window.addEventListener("resize", this.handleWindowResize);
           window.addEventListener("orientationchange", this.handleWindowResize);
+
+          this.$emit('webcam-ready');
         })
         .catch((err) => console.log("navigator.getUserMedia error: ", err));
     }
