@@ -20,6 +20,7 @@
 
 <script>
 import ZonesFrame from "./ZonesFrame.vue";
+import CocoSSDMixin from "../mixins/CocoSSDMixin";
 
 const constraints = {
   video: { facingMode: "environment" },
@@ -29,6 +30,7 @@ const constraints = {
 export default {
   name: "VideoFrame",
   components: { ZonesFrame },
+  mixins: [CocoSSDMixin],
   data() {
     return {
       zones: [], // zones returned by the server and displayed in realtime in SVG element
@@ -127,7 +129,6 @@ export default {
         .getUserMedia(constraints)
         .then((stream) => {
           this.video.srcObject = stream;
-          this.video.play();
 
           // Listen for the loadedmetadata event which is dispatched
           // when the user agent has just determined the duration and dimensions of the media resource

@@ -9,7 +9,8 @@
     <video-frame
       class="video-wrapper"
       :playVideo="playVideo"
-      @zone-prediction="handleZoneUpdate"
+      @model-loaded="$emit('model-loaded')"
+      @zone-prediction="receiveZoneLabels"
     />
     <animated-word-list
       class="footer"
@@ -22,12 +23,10 @@
 import AnimatedWordList from "./AnimatedWordList.vue";
 import GameInfo from "./GameInfo.vue";
 import VideoFrame from "./VideoFrame.vue";
-import CocoSSDMixin from "../mixins/CocoSSDMixin";
 
 export default {
   name: "GamePanel",
   components: { AnimatedWordList, GameInfo, VideoFrame },
-  mixins: [CocoSSDMixin],
   data() {
     return {
       timerClock: null, // JS interval which periodically removes a second from the timer
@@ -71,10 +70,10 @@ export default {
       }
     },
     /**
-     * Receive zone from video frame ML
+     * Receive labels of zones from underlying component
      */
-    handleZoneUpdate(zones) {
-      zones.forEach((label) => this.foundWords.add(label));
+    receiveZoneLabels(labels) {
+      labels.forEach((label) => this.foundWords.add(label));
       this.score = this.foundWords.size;
     },
     /**
