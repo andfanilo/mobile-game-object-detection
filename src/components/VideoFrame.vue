@@ -62,7 +62,9 @@ export default {
      * Retrieve all labels into foundWords
      */
     updateZones() {
-      console.log("update");
+      const things = ["Rock", "Paper", "Scissor", "Cat", "Dog", "Fish"];
+      const thing = things[Math.floor(Math.random() * things.length)];
+      this.$emit("zone-prediction", [thing]);
     },
     /**
      * Update our width and height variables for video element
