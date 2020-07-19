@@ -8,13 +8,8 @@ export default {
       model: undefined, // store coco-ssd model there
     };
   },
-  methods: {
-    predictZones(videoEl) {
-      alert(videoEl);
-    },
-  },
   mounted() {
-    cocoSsd.load().then((loadedModel) => {
+    cocoSsd.load({ base: 'lite_mobilenet_v2' }).then((loadedModel) => {
       this.$emit('model-loaded');
       this.model = loadedModel;
     });

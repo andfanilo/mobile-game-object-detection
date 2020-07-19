@@ -71,6 +71,9 @@ export default {
      * Retrieve all labels into foundWords
      */
     updateZones() {
+      this.model.detect(this.video).then((zones) => {
+        console.log(zones);
+      });
       const things = ["Rock", "Paper", "Scissor", "Cat", "Dog", "Fish"];
       const thing = things[Math.floor(Math.random() * things.length)];
       this.$emit("zone-prediction", [thing]);
@@ -129,6 +132,7 @@ export default {
         .getUserMedia(constraints)
         .then((stream) => {
           this.video.srcObject = stream;
+          this.video.play();
 
           // Listen for the loadedmetadata event which is dispatched
           // when the user agent has just determined the duration and dimensions of the media resource
