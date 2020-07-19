@@ -25,12 +25,17 @@ export default {
   data() {
     return {
       zones: [], // zones returned by the server and displayed in realtime in SVG element
+      zoneRefreshClock: null, // JS interval which periodically get zones from server
       video: null, // reference to video element
       frameWidth: 640,
       frameHeight: 480,
       videoWidth: 0, // refresh width of video that is passed to svg width
       videoHeight: 0 // refresh height of video that is passed to svg height
     };
+  },
+  props: ["playVideo"],
+  watch: {
+    playVideo: "handleVideoPropChange" // when parent App changes the startGame property, run the startGame method
   },
   computed: {
     zonesViewbox: function() {
@@ -39,11 +44,45 @@ export default {
   },
   methods: {
     /**
+     * Start ML periodic prediction
+     * Stop prediction and video
+     */
+    handleVideoPropChange() {
+      if (this.playVideo) {
+        this.zoneRefreshClock = setInterval(
+          this.updateZones.bind(this),
+          process.env.VUE_APP_REFRESH_RATE
+        );
+      } else {
+        this.cleanVideo();
+      }
+    },
+    /**
+     * Run zone prediction on video element.
+     * Retrieve all labels into foundWords
+     */
+    updateZones() {
+      console.log("update");
+    },
+    /**
      * Update our width and height variables for video element
      */
     handleWindowResize() {
       this.videoWidth = this.video.offsetWidth;
       this.videoHeight = this.video.offsetHeight;
+    },
+    /**
+     * Clean timer and video
+     */
+    cleanVideo() {
+      clearInterval(this.zoneRefreshClock);
+
+      this.video.srcObject.getTracks()[0].stop();
+      this.video.srcObject = null;
+
+      window.removeEventListener("resize", this.handleWindowResize);
+      window.removeEventListener("orientationchange", this.handleWindowResize);
+      this.video.removeEventListener("loadedmetadata", this.handleWindowResize);
     }
   },
   mounted() {
@@ -94,12 +133,7 @@ export default {
     }
   },
   beforeDestroy() {
-    this.video.srcObject.getTracks()[0].stop();
-    this.video.srcObject = null;
-
-    window.removeEventListener("resize", this.handleWindowResize);
-    window.removeEventListener("orientationchange", this.handleWindowResize);
-    this.video.removeEventListener("loadedmetadata", this.handleWindowResize);
+    this.cleanVideo();
   }
 };
 </script>

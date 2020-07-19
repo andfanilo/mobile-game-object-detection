@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <game-info class="header" header="Find objects" :score="score" :timer="timer" />
-    <video-frame class="video-wrapper" />
+    <video-frame class="video-wrapper" :playVideo="playVideo" />
     <animated-word-list class="footer" :words="Array.from(foundWords).reverse()" />
   </div>
 </template>
@@ -18,14 +18,18 @@ export default {
     return {
       timerClock: null, // JS interval which periodically removes a second from the timer
       timer: 90,
-      score: 0,
-      zoneRefreshClock: null, // JS interval which periodically get zones from server
-      foundWords: new Set(["cat", "dog"]) // all unique labels found by the user
+      foundWords: new Set(["cat", "dog"]), // all unique labels found by the user
+      playVideo: false
     };
   },
   props: ["startGame"], // watch the startGame property which will be changed by parent App
   watch: {
     startGame: "handleStartGame" // when parent App changes the startGame property, run the startGame method
+  },
+  computed: {
+    score() {
+      return this.foundWords.size;
+    }
   },
   methods: {
     /**
@@ -34,11 +38,8 @@ export default {
      */
     handleStartGame() {
       if (this.startGame) {
-        this.zoneRefreshClock = setInterval(
-          this.updateZones.bind(this),
-          process.env.VUE_APP_REFRESH_RATE
-        );
         this.timerClock = setInterval(this.manageTimer.bind(this), 1000);
+        this.playVideo = true;
       }
     },
     /**
@@ -50,6 +51,7 @@ export default {
       if (this.timer > 0) {
         this.timer--;
       } else {
+        this.playVideo = false;
         this.cleanApp();
         this.$emit("end-game", {
           score: this.score,
@@ -59,17 +61,9 @@ export default {
       }
     },
     /**
-     * Run zone prediction on video element.
-     * Retrieve all labels into foundWords
-     */
-    updateZones() {
-      console.log("update");
-    },
-    /**
      * Clean all states of the component
      */
     cleanApp() {
-      clearInterval(this.zoneRefreshClock);
       clearInterval(this.timerClock);
     }
   },
