@@ -1,13 +1,6 @@
 <template>
   <div>
-    <video
-      ref="video"
-      class="video-wrapper__video"
-      id="video"
-      autoplay
-      muted
-      playsinline
-    />
+    <video ref="video" class="video-wrapper__video" id="video" autoplay muted playsinline />
     <zones-frame
       class="video-wrapper__zones"
       :height="videoHeight"
@@ -24,7 +17,7 @@ import CocoSSDMixin from "../mixins/CocoSSDMixin";
 
 const constraints = {
   video: { facingMode: "environment" },
-  audio: false,
+  audio: false
 };
 
 export default {
@@ -34,22 +27,21 @@ export default {
   data() {
     return {
       zones: [], // zones returned by the server and displayed in realtime in SVG element
-      zoneRefreshClock: null, // JS interval which periodically get zones from server
       video: null, // reference to video element
       frameWidth: 640,
       frameHeight: 480,
       videoWidth: 0, // refresh width of video that is passed to svg width
-      videoHeight: 0, // refresh height of video that is passed to svg height
+      videoHeight: 0 // refresh height of video that is passed to svg height
     };
   },
   props: ["playVideo"],
   watch: {
-    playVideo: "handleVideoPropChange", // when parent App changes the startGame property, run the startGame method
+    playVideo: "handleVideoPropChange" // when parent App changes the startGame property, run the startGame method
   },
   computed: {
     zonesViewbox: function() {
       return `0 0 ${this.frameWidth} ${this.frameHeight}`;
-    },
+    }
   },
   methods: {
     /**
@@ -58,10 +50,7 @@ export default {
      */
     handleVideoPropChange() {
       if (this.playVideo) {
-        this.zoneRefreshClock = setInterval(
-          this.updateZones.bind(this),
-          process.env.VUE_APP_REFRESH_RATE
-        );
+        this.detectFromVideoFrame(this.model, this.video);
       } else {
         this.cleanVideo();
       }
@@ -70,13 +59,21 @@ export default {
      * Run zone prediction on video element.
      * Retrieve all labels into foundWords
      */
-    updateZones() {
-      this.model.detect(this.video).then((zones) => {
-        console.log(zones);
-      });
-      const things = ["Rock", "Paper", "Scissor", "Cat", "Dog", "Fish"];
-      const thing = things[Math.floor(Math.random() * things.length)];
-      this.$emit("zone-prediction", [thing]);
+    detectFromVideoFrame(model, videoEl) {
+      model.detect(videoEl).then(
+        zones => {
+          console.log(zones);
+          requestAnimationFrame(() => {
+            this.detectFromVideoFrame(model, videoEl);
+          });
+        },
+        error => {
+          console.log(error);
+        }
+      );
+      //const things = ["Rock", "Paper", "Scissor", "Cat", "Dog", "Fish"];
+      //const thing = things[Math.floor(Math.random() * things.length)];
+      //this.$emit("zone-prediction", [thing]);
     },
     /**
      * Update our width and height variables for video element
@@ -89,15 +86,13 @@ export default {
      * Clean timer and video
      */
     cleanVideo() {
-      clearInterval(this.zoneRefreshClock);
-
       this.video.srcObject.getTracks()[0].stop();
       this.video.srcObject = null;
 
       window.removeEventListener("resize", this.handleWindowResize);
       window.removeEventListener("orientationchange", this.handleWindowResize);
       this.video.removeEventListener("loadedmetadata", this.handleWindowResize);
-    },
+    }
   },
   mounted() {
     this.video = this.$refs.video;
@@ -109,10 +104,10 @@ export default {
           y1: 60,
           x2: 400,
           y2: 300,
-          color: "255,0,0",
+          color: "255,0,0"
         },
         label: "cat",
-        confidence: 0.8380282521247864,
+        confidence: 0.8380282521247864
       },
       {
         bbox: {
@@ -120,17 +115,17 @@ export default {
           y1: 30,
           x2: 50,
           y2: 50,
-          color: "0,255,0",
+          color: "0,255,0"
         },
         label: "dog",
-        confidence: 0.8380282521247864,
-      },
+        confidence: 0.8380282521247864
+      }
     ];
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia(constraints)
-        .then((stream) => {
+        .then(stream => {
           this.video.srcObject = stream;
           this.video.play();
 
@@ -143,14 +138,14 @@ export default {
           window.addEventListener("resize", this.handleWindowResize);
           window.addEventListener("orientationchange", this.handleWindowResize);
 
-          this.$emit('webcam-ready');
+          this.$emit("webcam-ready");
         })
-        .catch((err) => console.log("navigator.getUserMedia error: ", err));
+        .catch(err => console.log("navigator.getUserMedia error: ", err));
     }
   },
   beforeDestroy() {
     this.cleanVideo();
-  },
+  }
 };
 </script>
 
