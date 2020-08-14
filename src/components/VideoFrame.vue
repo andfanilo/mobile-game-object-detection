@@ -8,6 +8,7 @@
       :viewBox="zonesViewbox"
       :zones="zones"
     />
+    <canvas ref="canvas" class="canvas" :width="frameWidth" :height="frameHeight"></canvas>
   </div>
 </template>
 
@@ -17,7 +18,7 @@ import CocoSSDMixin from "../mixins/CocoSSDMixin";
 
 const constraints = {
   video: { facingMode: "environment" },
-  audio: false
+  audio: false,
 };
 
 export default {
@@ -26,48 +27,52 @@ export default {
   mixins: [CocoSSDMixin],
   data() {
     return {
-      zones: [], // zones returned by the server and displayed in realtime in SVG element
+      zones: [], // zones returned by the model, to display in ZonesFrame
       video: null, // reference to video element
+      invisibleCanvas: null, // reference to canvas where sending lowres video for prediction
+      predictionClock: null, // JS interval which periodically get zones from model
       frameWidth: 640,
       frameHeight: 480,
       videoWidth: 0, // refresh width of video that is passed to svg width
-      videoHeight: 0 // refresh height of video that is passed to svg height
+      videoHeight: 0, // refresh height of video that is passed to svg height
     };
   },
   props: ["playVideo"],
   watch: {
-    playVideo: "handleVideoPropChange" // when parent App changes the startGame property, run the startGame method
+    playVideo: "handleVideoPropChange", // when parent App changes the startGame property, run the startGame method
   },
   computed: {
-    zonesViewbox: function() {
+    zonesViewbox: function () {
       return `0 0 ${this.frameWidth} ${this.frameHeight}`;
-    }
+    },
   },
   methods: {
     /**
-     * Start ML periodic prediction
-     * Stop prediction and video
+     * Start ML periodic prediction if video is activated
+     * Else stop prediction and video
      */
     handleVideoPropChange() {
       if (this.playVideo) {
-        this.detectFromVideoFrame(this.model, this.video);
+        this.predictionClock = setInterval(
+          this.detectObjects.bind(this),
+          process.env.VUE_APP_REFRESH_RATE
+        );
       } else {
-        this.cleanVideo();
+        this.cleanup();
       }
     },
     /**
      * Run zone prediction on video element.
      * Retrieve all labels into foundWords
      */
-    detectFromVideoFrame(model, videoEl) {
-      model.detect(videoEl).then(
-        zones => {
+    detectObjects() {
+      let context = this.invisibleCanvas.getContext("2d");
+      context.drawImage(this.video, 0, 0, this.frameWidth, this.frameHeight);
+      this.model.detect(this.invisibleCanvas).then(
+        (zones) => {
           console.log(zones);
-          requestAnimationFrame(() => {
-            this.detectFromVideoFrame(model, videoEl);
-          });
         },
-        error => {
+        (error) => {
           console.log(error);
         }
       );
@@ -85,17 +90,20 @@ export default {
     /**
      * Clean timer and video
      */
-    cleanVideo() {
+    cleanup() {
+      clearInterval(this.predictionClock);
+
       this.video.srcObject.getTracks()[0].stop();
       this.video.srcObject = null;
 
       window.removeEventListener("resize", this.handleWindowResize);
       window.removeEventListener("orientationchange", this.handleWindowResize);
       this.video.removeEventListener("loadedmetadata", this.handleWindowResize);
-    }
+    },
   },
   mounted() {
     this.video = this.$refs.video;
+    this.invisibleCanvas = this.$refs.canvas;
 
     this.zones = [
       {
@@ -104,10 +112,10 @@ export default {
           y1: 60,
           x2: 400,
           y2: 300,
-          color: "255,0,0"
+          color: "255,0,0",
         },
         label: "cat",
-        confidence: 0.8380282521247864
+        confidence: 0.8380282521247864,
       },
       {
         bbox: {
@@ -115,17 +123,17 @@ export default {
           y1: 30,
           x2: 50,
           y2: 50,
-          color: "0,255,0"
+          color: "0,255,0",
         },
         label: "dog",
-        confidence: 0.8380282521247864
-      }
+        confidence: 0.8380282521247864,
+      },
     ];
 
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       navigator.mediaDevices
         .getUserMedia(constraints)
-        .then(stream => {
+        .then((stream) => {
           this.video.srcObject = stream;
           this.video.play();
 
@@ -140,16 +148,22 @@ export default {
 
           this.$emit("webcam-ready");
         })
-        .catch(err => console.log("navigator.getUserMedia error: ", err));
+        .catch((err) => console.log("navigator.getUserMedia error: ", err));
     }
   },
   beforeDestroy() {
-    this.cleanVideo();
-  }
+    this.cleanup();
+  },
 };
 </script>
 
 <style scoped>
+.canvas {
+  position: absolute;
+  display: none;
+  z-index: 99;
+}
+
 .video-wrapper__video {
   background-color: #000000;
   position: absolute;

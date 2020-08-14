@@ -1,6 +1,8 @@
 # Object detection game
 
-Detect a maximum of objects the model can detect, in a minimum of time
+> The demo was initially YOLOv3 behind a Flask server on GPU, and the Vue frontend hitting the backend for predictions. I wanted to try everything in the browser, so using CocoSSD instead and did a lot of refactoring to actually isolate logic in multiple components, but the inference is really slow on my computer...so right now I'm putting this project on pause.
+
+Detect a maximum of objects the model can detect, in a minimum of time.
 
 ## Project setup
 
